@@ -1,12 +1,15 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+const ALLOWED_CURRENCIES = ['usd', 'gbp'];
+
 exports.handler = async (event) => {
   try {
-    const { amount } = JSON.parse(event.body);
+    const { amount, currency } = JSON.parse(event.body);
+    const cur = ALLOWED_CURRENCIES.includes(currency) ? currency : 'usd';
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100),
-      currency: 'usd',
+      currency: cur,
     });
 
     return {
